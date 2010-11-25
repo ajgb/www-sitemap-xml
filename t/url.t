@@ -42,7 +42,7 @@ for my $args ( @valid ) {
     lives_ok {
         $o = WWW::Sitemap::XML::URL->new(%$args);
     } 'object created with valid args';
-    isa_ok($o->as_xml, 'XML::Twig::Elt');
+    isa_ok($o->as_xml, 'XML::LibXML::Element');
 }
 
 for my $args ( @invalid ) {

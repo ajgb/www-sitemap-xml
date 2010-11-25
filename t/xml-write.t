@@ -24,7 +24,7 @@ is scalar $o->urls, 9, "all 9 URLs loaded";
 
 my $wfn = "t/data/sitemap-$$.xml";
 lives_ok {
-    $o->write( $wfn, pretty_print => 'indented' );
+    $o->write( $wfn, my $pretty_print = 1 );
 } 'written sitemap.xml via filename';
 
 my $o2;
@@ -59,7 +59,7 @@ unlink $wfn;
 $wfn = "t/data/sitemap2-$$.xml";
 my $fh = IO::File->new( $wfn, "w");
 lives_ok {
-    $o->write( $fh, pretty_print => 'indented' );
+    $o->write( $fh, my $pretty_print = 1 );
 } 'written sitemap.xml via filehandle';
 $fh->close;
 
@@ -77,7 +77,7 @@ unlink $wfn;
 $wfn = "t/data/sitemap3-$$.xml";
 open SITEMAP1, ">", $wfn or die "Cannot open $wfn for writing: $!";
 lives_ok {
-    $o->write( \*SITEMAP1, pretty_print => 'indented' );
+    $o->write( \*SITEMAP1, my $pretty_print = 1 );
 } 'written sitemap.xml via filehandle';
 close SITEMAP1;
 

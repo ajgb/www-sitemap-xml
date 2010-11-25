@@ -6,7 +6,7 @@ package WWW::Sitemap::XML::URL;
 use Moose;
 use WWW::Sitemap::XML::Types qw( Location ChangeFreq Priority );
 use MooseX::Types::DateTime::W3C qw( DateTimeW3C );
-use XML::Twig ();
+use XML::LibXML;
 
 =head1 SYNOPSIS
 
@@ -99,23 +99,29 @@ has 'priority' => (
 
 =method as_xml
 
-Returns L<XML::Twig::Elt|XML::Twig/XML::Twig::Elt>
-object representing the C<E<lt>urlE<gt>> entry in the sitemap.
+Returns L<XML::LibXML::Element> object representing the C<E<lt>urlE<gt>> entry in the sitemap.
 
 =cut
 
 sub as_xml {
     my $self = shift;
 
-    return XML::Twig::Elt->new('url',
-        XML::Twig::Elt->new('loc', $self->loc),
-        map {
-            XML::Twig::Elt->new($_, $self->$_())
-        }
-        grep {
+    my $url = XML::LibXML::Element->new('url');
+
+    do {
+        my $name = $_;
+        my $e = XML::LibXML::Element->new($name);
+
+        $e->appendText( $self->$name );
+
+        $url->appendChild( $e );
+
+    } for 'loc',grep {
             eval('$self->has_'.$_) || defined $self->$_()
-        } qw( lastmod changefreq priority )
-    );
+        } qw( lastmod changefreq priority );
+
+
+    return $url;
 }
 
 around BUILDARGS => sub {

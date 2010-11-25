@@ -7,6 +7,7 @@ use Moose;
 
 use WWW::Sitemap::XML::URL;
 use XML::Twig;
+use XML::LibXML;
 use Scalar::Util qw( blessed );
 use IO::Zlib;
 
@@ -226,15 +227,15 @@ sub read {
     return @urls;
 }
 
-=method write($file, %options)
+=method write($file, $format = 0)
 
     # write to file
-    $map->write( 'sitemap.xml', pretty_print => 'indented');
+    $map->write( 'sitemap.xml', my $pretty_print = 1);
 
     # or
     my $fh = IO::File->new();
-    $fh->open("sitemap.xml", ">:utf8");
-    $map->write( $fh, pretty_print => 'indented');
+    $fh->open("sitemap.xml", "w");
+    $map->write( $fh, my $pretty_print = 1);
     $cfh->close;
 
     # write compressed
@@ -251,18 +252,19 @@ Write XML sitemap to C<$file> - a file name or L<IO::Handle> object.
 If file names ends in C<.gz> then the output file will be compressed using
 L<IO::Zlib>.
 
-Optional C<%options> are passed to C<flush> or C<print_to_file> methods
+Optional C<$format> is passed to C<toFH> or C<toFile> methods
 (depending on the type of C<$file>, respectively for file handle and file name)
-as decribed in L<XML::Twig>.
+as decribed in L<XML::LibXML>.
 
 =cut
 
 sub write {
-    my ($self, $fh, %options) = @_;
+    my ($self, $fh, $format) = @_;
 
-    my $writer = 'flush';
+    $format ||= 0;
+
+    my $writer = 'toFH';
     my $_fh_was_opened;
-
     unless ( ref $fh ) {
         if ( $fh =~ /\.gz$/i ) {
             my $fname = $fh;
@@ -272,12 +274,12 @@ sub write {
 
             $_fh_was_opened = 1;
         } else {
-            $writer = 'print_to_file';
+            $writer = 'toFile';
         }
     }
     my $xml = $self->as_xml;
 
-    $xml->$writer( $fh, %options );
+    $xml->$writer( $fh, $format );
 
     $fh->close if $_fh_was_opened;
 }
@@ -286,53 +288,53 @@ sub write {
 
     my $xml = $map->as_xml;
 
-    $xml->set_pretty_print('indented');
-
-    open SITEMAP, ">sitemap.xml";
-    print SITEMAP $xml->sprint;
-    close SITEMAP;
+    $xml->toFile( "sitemap.xml", my $pretty_print = 1 );
 
     # write compressed
-    $xml->set_pretty_print('none');
 
     my $cfh = IO::Zlib->new();
     $cfh->open("sitemap.xml.gz", "wb9");
 
-    print $cfh $xml->sprint;
+    $xml->toFH( $cfh );
 
     $cfh->close;
 
 
-Returns L<XML::Twig> object representing the sitemap in XML format.
+Returns L<XML::LibXML::Document> object representing the sitemap in XML format.
 
 =cut
 
-sub as_xml {
-    my $self = shift;
-
-    my $xt = XML::Twig->new(
-        no_prolog => 0,
-    );;
-
-    $xt->set_xml_version("1.0");
-    $xt->set_encoding("UTF-8");
-    my $root = XML::Twig::Elt->new('urlset',
-        {
-            'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9",
-            'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
-            'xsi:schemaLocation' => join(' ',
-                'http://www.sitemaps.org/schemas/sitemap/0.9',
-                'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'
-            ),
-        },
-        map {
-            my $xml = $_->as_xml;
-            ref $xml ? $xml : XML::Twig::Elt->parse($xml)
-        } $self->urls
+{
+    my %ns = (
+        'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9",
+        'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
+        'xsi:schemaLocation' => join(' ',
+            'http://www.sitemaps.org/schemas/sitemap/0.9',
+            'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'
+        ),
     );
-    $xt->set_root( $root );
 
-    return $xt;
+    sub as_xml {
+        my $self = shift;
+
+        my $xml = XML::LibXML->createDocument('1.0','UTF-8');
+        my $urlset = $xml->createElement('urlset');
+
+        while (my ($k, $v) = each %ns ) {
+            $urlset->setAttribute($k, $v);
+        };
+
+        $urlset->appendChild($_) for
+            map {
+                my $xml = $_->as_xml;
+                ref $xml ? $xml : XML::LibXML->load_xml(string => $xml)->documentElement()
+            } $self->urls;
+
+        $xml->setDocumentElement($urlset);
+
+        return $xml;
+    }
+
 }
 
 =head1 SEE ALSO

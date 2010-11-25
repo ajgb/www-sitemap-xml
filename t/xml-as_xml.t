@@ -35,8 +35,8 @@ is_deeply [ map { $_->loc} $o->urls ], [
 
 
 my $xml = $o->as_xml;
-isa_ok $o->as_xml, 'XML::Twig';
-is $xml->root->children_count, 9, "all 9 URLs in xml output";
+isa_ok $o->as_xml, 'XML::LibXML::Document';
+is @{[ $xml->getElementsByTagName('url') ]}, 9, "all 9 URLs in xml output";
 
 
 sub _read_sitemap {
