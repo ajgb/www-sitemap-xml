@@ -327,7 +327,7 @@ Returns L<XML::LibXML::Document> object representing the sitemap in XML format.
         $urlset->appendChild($_) for
             map {
                 my $xml = $_->as_xml;
-                ref $xml ? $xml : XML::LibXML->load_xml(string => $xml)->documentElement()
+                blessed $xml ? $xml : XML::LibXML->load_xml(string => $xml)->documentElement()
             } $self->urls;
 
         $xml->setDocumentElement($urlset);
