@@ -101,7 +101,7 @@ sub _pre_check_add {
     my $loc = $url->loc;
 
     die "URL cannot be longer then 2048 characters"
-        if length $loc >= 2048;
+        unless length $loc < 2048;
 
     my($scheme, $authority) = $loc =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?|;
     my $new = "$scheme://$authority";
