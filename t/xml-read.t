@@ -16,7 +16,7 @@ lives_ok {
 
 my @urls;
 lives_ok {
-    @urls = $o->read( _read_sitemap() );
+    @urls = $o->read( string => _read_sitemap() );
 } 'sitemap.xml loaded';
 
 is scalar @urls, 9, "all 9 URLs loaded";

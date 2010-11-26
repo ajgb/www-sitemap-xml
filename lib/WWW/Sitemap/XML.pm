@@ -6,10 +6,8 @@ package WWW::Sitemap::XML;
 use Moose;
 
 use WWW::Sitemap::XML::URL;
-use XML::Twig;
-use XML::LibXML;
+use XML::LibXML 1.70;
 use Scalar::Util qw( blessed );
-use IO::Zlib;
 
 use WWW::Sitemap::XML::Types qw( SitemapURL );
 
@@ -46,25 +44,17 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
     # load urls from existing sitemap.xml file
     $map->load( 'sitemap.xml' );
 
-    # get xml object
+    # get XML::LibXML object
     my $xml = $map->as_xml;
-    $xml->set_pretty_print('indented');
 
-    print $xml->sprint;
+    print $xml->toString(1);
 
     # write to file
-    $map->write( 'sitemap.xml', pretty_print => 'indented' );
+    $map->write( 'sitemap.xml', my $pretty_print = 1 );
 
     # write compressed
     $map->write( 'sitemap.xml.gz' );
 
-    # or
-    my $cfh = IO::Zlib->new();
-    $cfh->open("sitemap.xml.gz", "wb9");
-
-    $map->write( $cfh );
-
-    $cfh->close;
 
 =head1 DESCRIPTION
 
@@ -171,58 +161,61 @@ sub add {
     $self->_add_url( $arg );
 }
 
-=method load($sitemap)
+=method urls
 
-    $map->load( $sitemap );
+
+    my @urls = $map->urls;
+
+Returns a list of all URL objects added to sitemap.
+
+
+=method load(%sitemap_location)
+
+    $map->load( location => $sitemap_file );
 
 It is a shortcut for:
 
-    $map->add($_) for $map->read($sitemap);
+    $map->add($_) for $map->read( location => $sitemap_file );
 
 Please see L<"read"> for details.
 
 =cut
 
 sub load {
-    my ($self, $sitemap) = @_;
+    my $self = shift;
 
-    $self->add($_) for $self->read($sitemap);
+    $self->add($_) for $self->read(@_);
 }
 
-=method read($sitemap)
+=method read(%sitemap_location)
 
-    my @urls = $map->read( $sitemap );
+    # file or url to sitemap
+    my @urls = $map->read( location => $file_or_url );
 
-Read the content of C<$sitemap> and return the list of
-L<WWW::Sitemap::XML::URL> objects representing single C<E<lt>urlE<gt>>
-element.
+    # file handle
+    my @urls = $map->read( IO => $fh );
 
-C<$sitemap> could be either a string containing the whole XML sitemap, a
-filename of a sitemap file or an open L<IO::Handle>.
+    # xml string
+    my @urls = $map->read( string => $xml );
+
+Read the sitemap from file, URL, open file handle or string and return the list of
+L<WWW::Sitemap::XML::URL> objects representing C<E<lt>urlE<gt>> elements.
 
 =cut
 
 sub read {
-    my ($self, $sitemap) = @_;
+    my ($self, %sitemap) = @_;
 
     my @urls;
 
-    my $xt = XML::Twig->new(
-        twig_roots => {
-            'urlset/url' => sub {
-                my ($t, $url) = @_;
+    my $xml = XML::LibXML->load_xml( %sitemap );
 
-                push @urls,
-                    WWW::Sitemap::XML::URL->new(
-                        map { $_->name => $_->field } $url->children
-                    );
-
-                $t->purge;
-            }
-        }
-    );
-
-    $xt->parse($sitemap);
+    for my $url ( $xml->getDocumentElement->getElementsByTagName('url') ) {
+        push @urls,
+            WWW::Sitemap::XML::URL->new(
+                map { $_->nodeName => $_->textContent } $url->nonBlankChildNodes
+            );
+    }
 
     return @urls;
 }
@@ -241,20 +234,15 @@ sub read {
     # write compressed
     $map->write( 'sitemap.xml.gz' );
 
-    # or
-    my $cfh = IO::Zlib->new();
-    $cfh->open("sitemap.xml.gz", "wb9");
-    $map->write( $cfh );
-    $cfh->close;
-
 Write XML sitemap to C<$file> - a file name or L<IO::Handle> object.
 
-If file names ends in C<.gz> then the output file will be compressed using
-L<IO::Zlib>.
+If file names ends in C<.gz> then the output file will be compressed by
+setting compression on xml object - please note that it requires I<libxml2> to
+be compiled with I<zlib> support.
 
 Optional C<$format> is passed to C<toFH> or C<toFile> methods
 (depending on the type of C<$file>, respectively for file handle and file name)
-as decribed in L<XML::LibXML>.
+as described in L<XML::LibXML>.
 
 =cut
 
@@ -264,43 +252,33 @@ sub write {
     $format ||= 0;
 
     my $writer = 'toFH';
-    my $_fh_was_opened;
-    unless ( ref $fh ) {
-        if ( $fh =~ /\.gz$/i ) {
-            my $fname = $fh;
-
-            $fh = IO::Zlib->new($fname, "wb9")
-                or die "Cannot open $fname for writing: $!";
-
-            $_fh_was_opened = 1;
-        } else {
-            $writer = 'toFile';
-        }
-    }
     my $xml = $self->as_xml;
 
-    $xml->$writer( $fh, $format );
+    unless ( ref $fh ) {
+        $writer = 'toFile';
+        if ( $fh =~ /\.gz$/i ) {
+            $xml->setCompression(8);
+        }
+    }
 
-    $fh->close if $_fh_was_opened;
+    $xml->$writer( $fh, $format );
 }
 
 =method as_xml
 
     my $xml = $map->as_xml;
 
-    $xml->toFile( "sitemap.xml", my $pretty_print = 1 );
+    # pretty print
+    print $xml->toString(1);
 
     # write compressed
-
-    my $cfh = IO::Zlib->new();
-    $cfh->open("sitemap.xml.gz", "wb9");
-
-    $xml->toFH( $cfh );
-
-    $cfh->close;
+    $xml->setCompression(8);
+    $xml->toFile( "sitemap.xml" );
 
 
 Returns L<XML::LibXML::Document> object representing the sitemap in XML format.
+
+Builds the C<E<lt>urlE<gt>> by calling I<as_xml> on all URL objects added.
 
 =cut
 

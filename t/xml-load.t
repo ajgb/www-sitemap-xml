@@ -15,7 +15,7 @@ lives_ok {
 } 'test object created';
 
 lives_ok {
-    $o->load( _read_sitemap() );
+    $o->load( string => _read_sitemap() );
 } 'sitemap.xml loaded';
 
 is scalar $o->urls, 9, "all 9 URLs loaded";

@@ -14,9 +14,8 @@ lives_ok {
     $o = WWW::Sitemap::XML->new();
 } 'test object created';
 
-my $orig_sitemap = _read_sitemap();
 lives_ok {
-    $o->load( $orig_sitemap );
+    $o->load(string =>  _read_sitemap() );
 } 'sitemap.xml loaded';
 
 is scalar $o->urls, 9, "all 9 URLs loaded";

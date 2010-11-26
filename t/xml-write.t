@@ -17,7 +17,7 @@ lives_ok {
 } 'test object created';
 
 lives_ok {
-    $o->load( _read('t/data/sitemap.xml') );
+    $o->load( string => _read('t/data/sitemap.xml') );
 } 'sitemap.xml loaded';
 
 is scalar $o->urls, 9, "all 9 URLs loaded";
@@ -30,7 +30,7 @@ lives_ok {
 my $o2;
 lives_ok {
     $o2 = WWW::Sitemap::XML->new();
-    $o2->load( _read($wfn) );
+    $o2->load( string => _read($wfn) );
 } '...and loaded back';
 
 is_deeply [ $o->urls ], [ $o2->urls ],
@@ -47,14 +47,14 @@ lives_ok {
     $o2 = WWW::Sitemap::XML->new();
     my $fh = IO::Zlib->new;
     $fh->open($wfn, "rb" );
-    $o2->load( $fh );
+    $o2->load( IO => $fh );
     $fh->close;
 } '...and loaded back';
 
 is_deeply [ $o->urls ], [ $o2->urls ],
     "...and all urls were written";
 
-unlink $wfn;
+#unlink $wfn;
 
 $wfn = "t/data/sitemap2-$$.xml";
 my $fh = IO::File->new( $wfn, "w");
@@ -65,7 +65,7 @@ $fh->close;
 
 lives_ok {
     $o2 = WWW::Sitemap::XML->new();
-    $o2->load( _read($wfn) );
+    $o2->load( string => _read($wfn) );
 } '...and loaded back';
 
 is_deeply [ $o->urls ], [ $o2->urls ],
@@ -83,7 +83,7 @@ close SITEMAP1;
 
 lives_ok {
     $o2 = WWW::Sitemap::XML->new();
-    $o2->load( _read($wfn) );
+    $o2->load( string => _read($wfn) );
 } '...and loaded back';
 
 is_deeply [ $o->urls ], [ $o2->urls ],
