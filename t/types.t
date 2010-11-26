@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36;
+use Test::More tests => 38;
 use Test::Exception;
 use Test::NoWarnings;
 use URI;
@@ -29,10 +29,37 @@ use URI;
 }
 
 {
+    package Test::WWW::SitemapIndex::XML::NotImplements;
+    use Moose;
+
+    has 'loc' => (
+        is => 'rw',
+        isa => 'Str',
+    );
+}
+
+{
+    package Test::WWW::SitemapIndex::XML::DoesImplements;
+    use Moose;
+
+    has [qw( loc lastmod as_xml )] => (
+        is => 'rw',
+        isa => 'Str',
+    );
+
+    with 'WWW::SitemapIndex::XML::Sitemap::Interface';
+}
+
+{
 
     package Test::WWW::Sitemap::XML::Types;
     use Moose;
-    use WWW::Sitemap::XML::Types qw( SitemapURL Location ChangeFreq Priority );
+    use WWW::Sitemap::XML::Types qw( SitemapURL SitemapIndexSitemap Location ChangeFreq Priority );
+
+    has 'sitemap' => (
+        is => 'rw',
+        isa => SitemapIndexSitemap,
+    );
 
     has 'url' => (
         is => 'rw',
@@ -66,6 +93,9 @@ lives_ok {
 my $implements = Test::WWW::Sitemap::XML::DoesImplements->new();
 my $doesnt_implement = Test::WWW::Sitemap::XML::NotImplements->new();
 
+my $idx_implements = Test::WWW::SitemapIndex::XML::DoesImplements->new();
+my $idx_doesnt_implement = Test::WWW::SitemapIndex::XML::NotImplements->new();
+
 lives_ok {
     $o->url( $implements );
 } "SitemapURL accepts object implementing WWW::Sitemap::XML::URL::Interface";
@@ -73,6 +103,14 @@ lives_ok {
 dies_ok {
     $o->url( $doesnt_implement );
 } "SitemapURL rejects object not implementing WWW::Sitemap::XML::URL::Interface";
+
+lives_ok {
+    $o->sitemap( $idx_implements );
+} "SitemapIndexSitemap accepts object implementing WWW::SitemapIndex::XML::Sitemap::Interface";
+
+dies_ok {
+    $o->sitemap( $idx_doesnt_implement );
+} "SitemapIndexSitemap rejects object not implementing WWW::SitemapIndex::XML::Sitemap::Interface";
 
 my @valid_locs = (
     "http://mywebsite.com/",

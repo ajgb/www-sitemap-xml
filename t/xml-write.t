@@ -54,7 +54,7 @@ lives_ok {
 is_deeply [ $o->urls ], [ $o2->urls ],
     "...and all urls were written";
 
-#unlink $wfn;
+unlink $wfn;
 
 $wfn = "t/data/sitemap2-$$.xml";
 my $fh = IO::File->new( $wfn, "w");

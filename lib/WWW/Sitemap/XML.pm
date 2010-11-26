@@ -58,60 +58,82 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
 
 =head1 DESCRIPTION
 
-    <?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-       <url>
-          <loc>http://mywebsite.com/</loc>
-          <lastmod>2010-11-22</lastmod>
-          <changefreq>monthly</changefreq>
-          <priority>1.0</priority>
-       </url>
-    </urlset>
-
 Read and write sitemap xml files as defined at L<http://www.sitemaps.org/>.
 
 =cut
 
-has '_urlset' => (
+has '_rootcontainer' => (
     is => 'ro',
     traits => [qw( Array )],
     isa => 'ArrayRef',
     default => sub { [] },
     handles => {
-        _add_url => 'push',
-        _count_urls => 'count',
-        urls => 'elements',
+        _add_entry => 'push',
+        _count_entries => 'count',
+        _entries => 'elements',
     }
 );
 
-has '_first_url' => (
+has '_first_loc' => (
     is => 'rw',
-    isa => 'Str',
+);
+
+has '_check_req_interface' => (
+    is => 'ro',
+    default => sub {
+        sub {
+            die 'object does not implement WWW::Sitemap::XML::URL::Interface'
+                unless is_SitemapURL($_[0]);
+        }
+    }
+);
+
+has '_entry_class' => (
+    is => 'ro',
+    default => 'WWW::Sitemap::XML::URL'
+);
+
+has '_root_ns' => (
+    is => 'ro',
+    default => sub {
+        {
+            'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9",
+            'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
+            'xsi:schemaLocation' => join(' ',
+                'http://www.sitemaps.org/schemas/sitemap/0.9',
+                'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'
+            ),
+        }
+    },
+);
+
+has '_root_elem' => (
+    is => 'ro',
+    default => 'urlset',
 );
 
 sub _pre_check_add {
-    my ($self, $url) = @_;
+    my ($self, $entry) = @_;
 
-    die 'object does not implement WWW::Sitemap::XML::URL::Interface'
-        unless is_SitemapURL($url);
+    $self->_check_req_interface->($entry);
 
-    die "Sitemap cannot contain more then 50 000 URLs"
-        if $self->_count_urls >= 50_000;
+    die "Single file cannot contain more then 50 000 entries"
+        if $self->_count_entries >= 50_000;
 
-    my $loc = $url->loc;
+    my $loc = $entry->loc;
 
     die "URL cannot be longer then 2048 characters"
         unless length $loc < 2048;
 
     my($scheme, $authority) = $loc =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?|;
     my $new = "$scheme://$authority";
-    if ( $self->_count_urls ) {
-        my $first = $self->_first_url;
+    if ( $self->_count_entries ) {
+        my $first = $self->_first_loc;
 
-        die "URLs in sitemap should use the same protocol and reside on the "
+        die "All URLs in same file should use the same protocol and reside on the "
             ."same host: $first, not $new" unless $first eq $new;
     } else {
-        $self->_first_url( $new );
+        $self->_first_loc( $new );
     }
 }
 
@@ -163,12 +185,14 @@ Performs basic validation of urls added:
 sub add {
     my $self = shift;
 
+    my $class = $self->_entry_class;
+
     my $arg = @_ == 1 && blessed $_[0] ?
-                shift @_ : WWW::Sitemap::XML::URL->new(@_);
+                shift @_ : $class->new(@_);
 
     $self->_pre_check_add($arg);
 
-    $self->_add_url( $arg );
+    $self->_add_entry( $arg );
 }
 
 =method urls
@@ -176,6 +200,10 @@ sub add {
     my @urls = $map->urls;
 
 Returns a list of all URL objects added to sitemap.
+
+=cut
+
+sub urls { shift->_entries }
 
 =method load(%sitemap_location)
 
@@ -212,20 +240,21 @@ L<WWW::Sitemap::XML::URL> objects representing C<E<lt>urlE<gt>> elements.
 =cut
 
 sub read {
-    my ($self, %sitemap) = @_;
+    my ($self, %args) = @_;
 
-    my @urls;
+    my @entries;
+    my $class = $self->_entry_class;
 
-    my $xml = XML::LibXML->load_xml( %sitemap );
+    my $xml = XML::LibXML->load_xml( %args );
 
     for my $url ( $xml->getDocumentElement->nonBlankChildNodes() ) {
-        push @urls,
-            WWW::Sitemap::XML::URL->new(
+        push @entries,
+            $class->new(
                 map { $_->nodeName => $_->textContent } $url->nonBlankChildNodes
             );
     }
 
-    return @urls;
+    return @entries;
 }
 
 =method write($file, $format = 0)
@@ -235,7 +264,7 @@ sub read {
 
     # or
     my $fh = IO::File->new();
-    $fh->open("sitemap.xml", "w");
+    $fh->open('sitemap.xml', 'w');
     $map->write( $fh, my $pretty_print = 1);
     $cfh->close;
 
@@ -281,7 +310,7 @@ sub write {
 
     # write compressed
     $xml->setCompression(8);
-    $xml->toFile( "sitemap.xml" );
+    $xml->toFile( 'sitemap.xml.gz' );
 
 
 Returns L<XML::LibXML::Document> object representing the sitemap in XML format.
@@ -291,40 +320,30 @@ added into sitemap.
 
 =cut
 
-{
-    my %ns = (
-        'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9",
-        'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
-        'xsi:schemaLocation' => join(' ',
-            'http://www.sitemaps.org/schemas/sitemap/0.9',
-            'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'
-        ),
-    );
+sub as_xml {
+    my $self = shift;
 
-    sub as_xml {
-        my $self = shift;
+    my $xml = XML::LibXML->createDocument('1.0','UTF-8');
+    my $root = $xml->createElement($self->_root_elem);
 
-        my $xml = XML::LibXML->createDocument('1.0','UTF-8');
-        my $urlset = $xml->createElement('urlset');
+    while (my ($k, $v) = each %{ $self->_root_ns() } ) {
+        $root->setAttribute($k, $v);
+    };
 
-        while (my ($k, $v) = each %ns ) {
-            $urlset->setAttribute($k, $v);
-        };
+    $root->appendChild($_) for
+        map {
+            my $xml = $_->as_xml;
+            blessed $xml ? $xml : XML::LibXML->load_xml(string => $xml)->documentElement()
+        } $self->_entries;
 
-        $urlset->appendChild($_) for
-            map {
-                my $xml = $_->as_xml;
-                blessed $xml ? $xml : XML::LibXML->load_xml(string => $xml)->documentElement()
-            } $self->urls;
+    $xml->setDocumentElement($root);
 
-        $xml->setDocumentElement($urlset);
-
-        return $xml;
-    }
-
+    return $xml;
 }
 
 =head1 SEE ALSO
+
+L<WWW::SitemapIndex::XML>
 
 L<http://www.sitemaps.org/>
 

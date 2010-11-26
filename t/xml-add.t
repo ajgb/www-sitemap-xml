@@ -129,7 +129,7 @@ SKIP: {
     skip "long running tests", 1
         unless $ENV{RELEASE_TESTING};
 
-    for ( $o->_count_urls + 1 .. 50_000) {
+    for ( scalar($o->urls) + 1 .. 50_000) {
         $o->add( loc => "http://mywebsite.com:81/page-no-$_.html" );
     }
 

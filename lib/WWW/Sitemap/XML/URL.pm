@@ -12,14 +12,12 @@ use XML::LibXML;
 
     my $url = WWW::Sitemap::XML::URL->new(
         loc => 'http://mywebsite.com/',
-        lastmod => time(),
+        lastmod => '2010-11-26',
         changefreq => 'always',
         priority => 1.0,
     );
 
-=head1 DESCRIPTION
-
-WWW::Sitemap::XML::URL represents single url entry in sitemap file.
+XML sample:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -29,12 +27,14 @@ WWW::Sitemap::XML::URL represents single url entry in sitemap file.
           <changefreq>always</changefreq>
           <priority>1.0</priority>
        </url>
-        <url>
-          <loc>http://mywebsite.com/page.html</loc>
-       </url>
     </urlset>
 
-Implements L<WWW::Sitemap::XML::URL::Interface>.
+
+=head1 DESCRIPTION
+
+WWW::Sitemap::XML::URL represents single url entry in sitemap file.
+
+Class implements L<WWW::Sitemap::XML::URL::Interface>.
 
 =cut
 
@@ -60,7 +60,7 @@ has 'loc' => (
 
 =attr lastmod
 
-The date of last modification of the file.
+The date of last modification of the page.
 
 isa: L<MooseX::Types::DateTime::W3C/"DateTimeW3C">
 

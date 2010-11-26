@@ -5,6 +5,7 @@ package WWW::Sitemap::XML::Types;
 
 use MooseX::Types -declare => [qw(
     SitemapURL
+    SitemapIndexSitemap
 
     Location
     ChangeFreq
@@ -23,6 +24,16 @@ subtype SitemapURL,
     message {
         'object does not implement WWW::Sitemap::XML::URL::Interface'
     };
+
+subtype SitemapIndexSitemap,
+    as Object,
+    where {
+        $_->meta->does_role('WWW::SitemapIndex::XML::Sitemap::Interface')
+    },
+    message {
+        'object does not implement WWW::SitemapIndex::XML::Sitemap::Interface'
+    };
+
 
 # <loc>
 subtype Location,
@@ -53,17 +64,6 @@ subtype Priority,
 =head1 DESCRIPTION
 
 Type constraints used by L<WWW::Sitemap::XML> and L<WWW::Sitemap::XML::URL>.
-
-=cut
-
-=type SitemapURL
-
-    has 'url' => (
-        is => 'rw',
-        isa => SitemapURL,
-    );
-
-Subtype of C<Object>, argument needs to implement L<WWW::Sitemap::XML::URL::Interface>.
 
 =type Location
 
@@ -109,6 +109,24 @@ Valid values are:
     );
 
 Subtype of C<Num> with values in range from C<0.0> to C<1.0>.
+
+=type SitemapURL
+
+    has 'url' => (
+        is => 'rw',
+        isa => SitemapURL,
+    );
+
+Subtype of C<Object>, argument needs to implement L<WWW::Sitemap::XML::URL::Interface>.
+
+=type SitemapIndexSitemap
+
+    has 'sitemap' => (
+        is => 'rw',
+        isa => SitemapIndexSitemap,
+    );
+
+Subtype of C<Object>, argument needs to implement L<WWW::SitemapIndex::XML::Sitemap::Interface>.
 
 =cut
 
