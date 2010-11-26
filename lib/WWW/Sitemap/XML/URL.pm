@@ -21,6 +21,19 @@ use XML::LibXML;
 
 WWW::Sitemap::XML::URL represents single url entry in sitemap file.
 
+    <?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+       <url>
+          <loc>http://mywebsite.com/</loc>
+          <lastmod>2010-11-26</lastmod>
+          <changefreq>always</changefreq>
+          <priority>1.0</priority>
+       </url>
+        <url>
+          <loc>http://mywebsite.com/page.html</loc>
+       </url>
+    </urlset> 
+
 Implements L<WWW::Sitemap::XML::URL::Interface>.
 
 =cut
