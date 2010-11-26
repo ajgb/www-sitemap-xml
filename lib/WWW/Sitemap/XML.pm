@@ -210,7 +210,7 @@ sub read {
 
     my $xml = XML::LibXML->load_xml( %sitemap );
 
-    for my $url ( $xml->getDocumentElement->getElementsByTagName('url') ) {
+    for my $url ( $xml->getDocumentElement->nonBlankChildNodes() ) {
         push @urls,
             WWW::Sitemap::XML::URL->new(
                 map { $_->nodeName => $_->textContent } $url->nonBlankChildNodes
@@ -278,7 +278,8 @@ sub write {
 
 Returns L<XML::LibXML::Document> object representing the sitemap in XML format.
 
-Builds the C<E<lt>urlE<gt>> by calling I<as_xml> on all URL objects added.
+The C<E<lt>urlE<gt>> elements are built by calling I<as_xml> on all URL objects
+added into sitemap.
 
 =cut
 
