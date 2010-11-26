@@ -1,5 +1,9 @@
 Revision history for WWW-Sitemap-XML
 
+1.103300    Fri Nov 26 15:17:18 2010
+            Add support for sitemap index files.
+            Replace XML::Twig with XML::LibXML.
+
 1.103270    Tue Nov 23 23:55:01 2010
             First version.
 
