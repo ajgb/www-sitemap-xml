@@ -113,7 +113,8 @@ for my $invalid_cf ( qw( nightly fortnight ) ) {
     } qr/Invalid changefreq/, "$invalid_cf is not a valid ChangeFreq";
 }
 
-for (my $p = 0.0; $p <= 1; $p += 0.1 ) {
+for ( 0 .. 10 ) {
+    my $p = sprintf("%.1f", $_/10);
     lives_ok {
         $o->priority( $p );
     } "$p is a valid Priority";
