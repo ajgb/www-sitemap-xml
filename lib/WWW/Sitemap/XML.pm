@@ -66,7 +66,7 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
           <changefreq>monthly</changefreq>
           <priority>1.0</priority>
        </url>
-    </urlset> 
+    </urlset>
 
 Read and write sitemap xml files as defined at L<http://www.sitemaps.org/>.
 

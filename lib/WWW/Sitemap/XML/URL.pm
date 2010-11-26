@@ -32,7 +32,7 @@ WWW::Sitemap::XML::URL represents single url entry in sitemap file.
         <url>
           <loc>http://mywebsite.com/page.html</loc>
        </url>
-    </urlset> 
+    </urlset>
 
 Implements L<WWW::Sitemap::XML::URL::Interface>.
 
