@@ -163,11 +163,9 @@ sub add {
 
 =method urls
 
-
     my @urls = $map->urls;
 
 Returns a list of all URL objects added to sitemap.
-
 
 =method load(%sitemap_location)
 
