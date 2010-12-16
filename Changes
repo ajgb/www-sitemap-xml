@@ -1,5 +1,9 @@
 Revision history for WWW-Sitemap-XML
 
+1.103500    Thu Dec 16 22:04:08 2010
+            fix invalid schemaLocation for sitemap index files
+                - reported by Michael Schaap
+
 1.103300    Fri Nov 26 15:17:18 2010
             Add support for sitemap index files.
             Replace XML::Twig with XML::LibXML.
