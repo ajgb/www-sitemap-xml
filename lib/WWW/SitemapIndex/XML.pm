@@ -82,7 +82,7 @@ has '+_root_ns' => (
             'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
             'xsi:schemaLocation' => join(' ',
                 'http://www.sitemaps.org/schemas/sitemap/0.9',
-                'http://www.sitemaps.org/schemas/sitemap/0.9/sitemapindex.xsd'
+                'http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd'
             ),
         }
     },
