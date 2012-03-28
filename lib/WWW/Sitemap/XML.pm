@@ -58,7 +58,7 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
 
 =head1 DESCRIPTION
 
-Read and write sitemap xml files as defined at L<http://www.sitemaps.org/>.
+Read and write sitemap XML files as defined at L<http://www.sitemaps.org/>.
 
 =cut
 
@@ -168,11 +168,11 @@ L<WWW::Sitemap::XML::URL> object.
     # is same as
     $map->add( loc => 'http://mywebsite.com/' );
 
-Performs basic validation of urls added:
+Performs basic validation of URLs added:
 
 =over
 
-=item * maximum of 50 000 urls in single sitemap
+=item * maximum of 50 000 URLs in single sitemap
 
 =item * URL no longer then 2048 characters
 
@@ -231,7 +231,7 @@ sub load {
     # file handle
     my @urls = $map->read( IO => $fh );
 
-    # xml string
+    # XML string
     my @urls = $map->read( string => $xml );
 
 Read the sitemap from file, URL, open file handle or string and return the list of
@@ -274,7 +274,7 @@ sub read {
 Write XML sitemap to C<$file> - a file name or L<IO::Handle> object.
 
 If file names ends in C<.gz> then the output file will be compressed by
-setting compression on xml object - please note that it requires I<libxml2> to
+setting compression on XML object - please note that it requires I<libxml2> to
 be compiled with I<zlib> support.
 
 Optional C<$format> is passed to C<toFH> or C<toFile> methods
