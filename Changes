@@ -1,5 +1,10 @@
 Revision history for WWW-Sitemap-XML
 
+1.121160    Wed Apr 25 23:33:25 2012
+            [github#2] Updating documentation to use consistent forms of XML
+            and URL
+            [rt#69660] Moose version dependency
+            
 1.103500    Thu Dec 16 22:04:08 2010
             fix invalid schemaLocation for sitemap index files
                 - reported by Michael Schaap
