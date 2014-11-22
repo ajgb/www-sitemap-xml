@@ -1,7 +1,7 @@
+#ABSTRACT: XML Sitemap protocol
 use strict;
 use warnings;
 package WWW::Sitemap::XML;
-#ABSTRACT: XML Sitemap protocol
 
 use Moose;
 

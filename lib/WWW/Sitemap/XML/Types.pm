@@ -1,7 +1,7 @@
+#ABSTRACT: Type constraints used by WWW::Sitemap::XML and WWW::Sitemap::XML::URL
 use strict;
 use warnings;
 package WWW::Sitemap::XML::Types;
-#ABSTRACT: Type constraints used by WWW::Sitemap::XML and WWW::Sitemap::XML::URL
 
 use MooseX::Types -declare => [qw(
     SitemapURL

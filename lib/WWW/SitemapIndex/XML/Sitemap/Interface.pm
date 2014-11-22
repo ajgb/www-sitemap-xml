@@ -1,8 +1,8 @@
+#ABSTRACT: Abstract interface for sitemap indexes' Sitemap classes
 use strict;
 use warnings;
 package WWW::SitemapIndex::XML::Sitemap::Interface;
 use Moose::Role;
-#ABSTRACT: Abstract interface for sitemap indexes' Sitemap classes
 
 requires qw(
     loc lastmod as_xml

@@ -1,7 +1,7 @@
+#ABSTRACT: XML Sitemap index sitemap entry
 use strict;
 use warnings;
 package WWW::SitemapIndex::XML::Sitemap;
-#ABSTRACT: XML Sitemap index sitemap entry
 
 use Moose;
 use WWW::Sitemap::XML::Types qw( Location );

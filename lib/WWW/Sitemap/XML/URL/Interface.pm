@@ -1,8 +1,8 @@
+#ABSTRACT: Abstract interface for sitemap's URL classes
 use strict;
 use warnings;
 package WWW::Sitemap::XML::URL::Interface;
 use Moose::Role;
-#ABSTRACT: Abstract interface for sitemap's URL classes
 
 requires qw(
     loc lastmod changefreq priority as_xml

@@ -1,7 +1,7 @@
+#ABSTRACT: XML Sitemap url entry
 use strict;
 use warnings;
 package WWW::Sitemap::XML::URL;
-#ABSTRACT: XML Sitemap url entry
 
 use Moose;
 use WWW::Sitemap::XML::Types qw( Location ChangeFreq Priority );

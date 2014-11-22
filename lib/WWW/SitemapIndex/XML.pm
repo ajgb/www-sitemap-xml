@@ -1,7 +1,7 @@
+#ABSTRACT: XML Sitemap index protocol
 use strict;
 use warnings;
 package WWW::SitemapIndex::XML;
-#ABSTRACT: XML Sitemap index protocol
 
 use Moose;
 extends qw( WWW::Sitemap::XML );
