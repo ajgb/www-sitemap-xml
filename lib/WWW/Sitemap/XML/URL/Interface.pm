@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 package WWW::Sitemap::XML::URL::Interface;
+
 use Moose::Role;
 
 requires qw(
