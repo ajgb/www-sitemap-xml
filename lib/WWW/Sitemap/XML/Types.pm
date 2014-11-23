@@ -9,6 +9,7 @@ use MooseX::Types -declare => [qw(
 
     Location
     ChangeFreq
+    LowercaseStr
     Priority
 )];
 
@@ -48,10 +49,28 @@ coerce Location,
     from Uri,
     via { $_->as_string };
 
+subtype LowercaseStr,
+    as Str,
+    where {
+        $_ eq lc($_)
+    },
+    message { "$_ contains uppercase characters" };
+
+coerce LowercaseStr,
+    from Str,
+    via { lc($_) };
+
 # <changefreq>
+my %valid_changefreqs = map { $_ => 1 } qw( always hourly daily weekly monthly yearly never );
 subtype ChangeFreq,
-    as enum([ qw( always hourly daily weekly monthly yearly never ) ]),
-    message { 'Invalid changefreq' };
+    as LowercaseStr,
+    where {
+        exists $valid_changefreqs{$_}
+    };
+
+coerce ChangeFreq,
+    from Str,
+    via { lc($_) };
 
 # <priority>
 subtype Priority,
