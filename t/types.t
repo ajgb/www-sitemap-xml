@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 40;
 use Test::Exception;
 use Test::NoWarnings;
 use URI;
@@ -146,9 +146,12 @@ for my $valid_changefreq ( qw( always hourly daily weekly monthly yearly never )
 }
 
 for my $invalid_cf ( qw( nightly fortnight ) ) {
-    throws_ok {
+    eval {
         $o->changefreq( $invalid_cf );
-    } qr/Invalid changefreq/, "$invalid_cf is not a valid ChangeFreq";
+    };
+    my $e = $@;
+    isa_ok($e, 'Moose::Exception');
+    is($e->attribute_name, 'changefreq', '...and exception thrown for changefreq');
 }
 
 for ( 0 .. 10 ) {
