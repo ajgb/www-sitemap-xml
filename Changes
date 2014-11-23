@@ -1,5 +1,11 @@
 Revision history for WWW-Sitemap-XML
 
+{{$NEXT}}
+    Automatically lowercase the changefreq when loading invalid sitemaps
+        (Requesteed in GH#5 Case insensitive values, by rkleemann)
+    Ignore comments from loaded XML files
+        (GH#3 Sitemap with comments not working, by astuanax)
+
 1.121160    Wed Apr 25 23:33:25 2012
             [github#2] Updating documentation to use consistent forms of XML
             and URL
