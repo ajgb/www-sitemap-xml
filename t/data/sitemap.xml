@@ -15,7 +15,7 @@
   <url>
     <loc>http://www.mywebsite.com/friendly_url.html?name=Alex%20J.%20G.%20Burzy%C5%84ski</loc>
     <lastmod>2010-11-19T16:05:01</lastmod>
-    <changefreq>Weekly</changefreq>
+    <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
@@ -39,7 +39,7 @@
   <url>
     <loc>http://www.mywebsite.com/3.html</loc>
     <lastmod>2010-11-19T16:05:01.45Z</lastmod>
-    <changefreq>Always</changefreq>
+    <changefreq>always</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
