@@ -93,6 +93,11 @@ has '+_root_elem' => (
     default => 'sitemapindex',
 );
 
+has '+_entry_elem' => (
+    is => 'ro',
+    default => 'sitemap',
+);
+
 =method add($sitemap|%attrs)
 
     $index->add(

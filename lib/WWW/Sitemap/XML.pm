@@ -112,6 +112,11 @@ has '_root_elem' => (
     default => 'urlset',
 );
 
+has '_entry_elem' => (
+    is => 'ro',
+    default => 'url',
+);
+
 sub _pre_check_add {
     my ($self, $entry) = @_;
 
@@ -246,11 +251,13 @@ sub read {
     my $class = $self->_entry_class;
 
     my $xml = XML::LibXML->load_xml( %args );
+    my $doc = $xml->getDocumentElement;
 
-    for my $url ( $xml->getDocumentElement->nonBlankChildNodes() ) {
+    for my $url ( $doc->getChildrenByLocalName( $self->_entry_elem ) ) {
         push @entries,
             $class->new(
-                map { $_->nodeName => $_->textContent } $url->nonBlankChildNodes
+                map { $_->localname => $_->textContent }
+                $url->nonBlankChildNodes
             );
     }
 
