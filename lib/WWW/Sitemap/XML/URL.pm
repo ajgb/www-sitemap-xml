@@ -90,6 +90,7 @@ has 'changefreq' => (
     is => 'rw',
     isa => ChangeFreq,
     required => 0,
+    coerce => 1,
     predicate => 'has_changefreq',
 );
 
