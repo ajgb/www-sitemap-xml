@@ -1,6 +1,7 @@
 Revision history for WWW-Sitemap-XML
 
 {{$NEXT}}
+    Documentation cleanup
 
 2.00   2014-11-30 02:03:03
     Automatically lowercase the changefreq when loading invalid sitemaps
