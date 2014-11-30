@@ -2,9 +2,11 @@ Revision history for WWW-Sitemap-XML
 
 {{$NEXT}}
     Automatically lowercase the changefreq when loading invalid sitemaps
-        (Requesteed in GH#5 Case insensitive values, by rkleemann)
+        (Requested in GH#5 Case insensitive values, by rkleemann)
     Ignore comments from loaded XML files
         (GH#3 Sitemap with comments not working, by astuanax)
+    Support Google sitemap video, image and mobile extensions
+        (Requested in GH#4 Image, Video, and Mobile sitemaps/extensions, by ianmcorvidae)
 
 1.121160    Wed Apr 25 23:33:25 2012
             [github#2] Updating documentation to use consistent forms of XML

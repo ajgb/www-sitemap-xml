@@ -26,6 +26,7 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
         lastmod => '2010-11-22',
         changefreq => 'monthly',
         priority => 1.0,
+        mobile => 1,
         images => [
             {
                 loc => 'http://mywebsite.com/image1.jpg',
@@ -62,6 +63,7 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
             lastmod => '2010-11-22',
             changefreq => 'monthly',
             priority => 1.0,
+            mobile => 1,
             images => [
                 WWW::Sitemap::XML::Google::Image->new(
                     {
@@ -168,6 +170,7 @@ has '_root_ns' => (
             ),
             'xmlns:image' => "http://www.google.com/schemas/sitemap-image/1.1",
             'xmlns:video' => "http://www.google.com/schemas/sitemap-video/1.1",
+            'xmlns:mobile' => "http://www.google.com/schemas/sitemap-mobile/1.0",
         }
     },
 );
@@ -335,7 +338,7 @@ sub read {
             if ( $localname eq 'image' ) {
                 push @{ $args{images} }, {
                     map {
-                        $_->localname => $_->firstChild->nodeValue
+                        $_->localname => $_->textContent
                     }
                     grep { $_->nodeType == XML_ELEMENT_NODE() }
                     $n->nonBlankChildNodes
@@ -350,7 +353,7 @@ sub read {
 
                     if ( $vname eq 'player_loc' ) {
                         $video->{player} = {
-                            loc => $cn->firstChild->nodeValue,
+                            loc => $cn->textContent,
                             (
                                 map {
                                     $_ => $cn->getAttribute($_)
@@ -362,14 +365,17 @@ sub read {
                         };
                     }
                     else {
-                        $video->{ $vname } = $cn->firstChild->nodeValue;
+                        $video->{ $vname } = $cn->textContent;
                     }
                 }
 
                 push @{ $args{videos} }, $video;
             }
+            elsif ( $localname eq 'mobile' ) {
+                $args{mobile} = 1;
+            }
             else {
-                $args{ $n->localname } = $n->firstChild->nodeValue;
+                $args{ $n->localname } = $n->textContent;
             }
         }
         push @entries,

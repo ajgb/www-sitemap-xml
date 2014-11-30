@@ -6,7 +6,7 @@ package WWW::Sitemap::XML::URL::Interface;
 use Moose::Role;
 
 requires qw(
-    loc lastmod changefreq priority images videos as_xml
+    loc lastmod changefreq priority images videos mobile as_xml
 );
 
 =head1 SYNOPSIS
@@ -22,6 +22,11 @@ requires qw(
     has [qw( images videos )] => (
         is => 'rw',
         isa => 'ArrayRef',
+    );
+
+    has [qw( mobile )] => (
+        is => 'rw',
+        isa => 'Bool',
     );
 
     with 'WWW::Sitemap::XML::URL::Interface';

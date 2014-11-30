@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Exception;
 use Test::NoWarnings;
 
@@ -41,6 +41,11 @@ is_deeply [ map { $_->priority } @urls ], [qw(
     0.1
     0.8
 )], "<priority> correct for all";
+
+is_deeply [ map { $_->mobile } @urls ], [
+    undef,
+    1
+], "<mobile:mobile> correct for all";
 
 is_deeply [ map { @{ $_->images } } @urls ], [
     WWW::Sitemap::XML::Google::Image->new(

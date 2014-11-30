@@ -38,6 +38,7 @@ Google sitemap video and image extensions:
         lastmod => '2010-11-26',
         changefreq => 'always',
         priority => 1.0,
+        mobile => 1,
         images => [
             {
                 loc => 'http://mywebsite.com/image1.jpg',
@@ -79,6 +80,7 @@ XML output:
           <lastmod>2010-11-26</lastmod>
           <changefreq>always</changefreq>
           <priority>1.0</priority>
+          <mobile:mobile/>
           <image:image>
              <image:loc>http://mywebsite.com/image1.jpg</image:loc>
              <image:caption>Caption 1</image:caption>
@@ -226,6 +228,30 @@ has 'videos' => (
     predicate => 'has_videos',
 );
 
+=attr mobile
+
+Flag indicating that page serves feature phone content.
+
+A mobile sitemap must contain only URLs that serve feature phone web content.
+All other URLs are ignored by the Google crawling mechanisms so, if you have
+non-featurephone content, create a separate sitemap for those URLs.
+
+Note: This is a Google sitemap extension.
+
+isa: I<Bool>
+
+Optional.
+
+=cut
+
+has 'mobile' => (
+    is => 'rw',
+    isa => 'Bool',
+    required => 0,
+    coerce => 0,
+    predicate => 'has_mobile',
+);
+
 =method as_xml
 
 Returns L<XML::LibXML::Element> object representing the C<E<lt>urlE<gt>> entry in the sitemap.
@@ -259,6 +285,11 @@ sub as_xml {
         for my $video ( @{ $self->videos || [] } ) {
             $url->appendChild( $video->as_xml );
         }
+    }
+
+    if ( $self->has_mobile && $self->mobile ) {
+        my $e = XML::LibXML::Element->new('mobile:mobile');
+        $url->appendChild( $e );
     }
 
     return $url;

@@ -39,6 +39,11 @@ lives_ok {
         isa => 'ArrayRef',
     );
 
+    has [qw( mobile )] => (
+        is => 'rw',
+        isa => 'Bool',
+    );
+
     with 'WWW::Sitemap::XML::URL::Interface';
 }
 

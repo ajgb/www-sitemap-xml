@@ -18,6 +18,7 @@ SYNOPSIS
             lastmod => '2010-11-22',
             changefreq => 'monthly',
             priority => 1.0,
+            mobile => 1,
             images => [
                 {
                     loc => 'http://mywebsite.com/image1.jpg',
@@ -54,6 +55,7 @@ SYNOPSIS
                 lastmod => '2010-11-22',
                 changefreq => 'monthly',
                 priority => 1.0,
+                mobile => 1,
                 images => [
                     WWW::Sitemap::XML::Google::Image->new(
                         {
