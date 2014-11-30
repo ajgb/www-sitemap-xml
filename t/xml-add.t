@@ -34,6 +34,11 @@ lives_ok {
         isa => 'Str',
     );
 
+    has [qw( images videos )] => (
+        is => 'rw',
+        isa => 'ArrayRef',
+    );
+
     with 'WWW::Sitemap::XML::URL::Interface';
 }
 

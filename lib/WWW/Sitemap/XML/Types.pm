@@ -11,30 +11,25 @@ use MooseX::Types -declare => [qw(
     ChangeFreq
     LowercaseStr
     Priority
+
+    VideoPlayer
+    VideoObject
+    ArrayRefOfVideoObjects
+    ImageObject
+    ArrayRefOfImageObjects
+    StrBool
+    Max100CharsStr
+    Max2048CharsStr
 )];
 
 use Moose::Util::TypeConstraints;
-use MooseX::Types::Moose qw( Object Str Num );
+use MooseX::Types::Moose qw( Object Str Num Bool ArrayRef HashRef );
 use MooseX::Types::URI qw( Uri );
+use Scalar::Util qw( blessed );
 
-subtype SitemapURL,
-    as Object,
-    where {
-        $_->meta->does_role('WWW::Sitemap::XML::URL::Interface')
-    },
-    message {
-        'object does not implement WWW::Sitemap::XML::URL::Interface'
-    };
+role_type SitemapURL, { role => 'WWW::Sitemap::XML::URL::Interface' };
 
-subtype SitemapIndexSitemap,
-    as Object,
-    where {
-        $_->meta->does_role('WWW::SitemapIndex::XML::Sitemap::Interface')
-    },
-    message {
-        'object does not implement WWW::SitemapIndex::XML::Sitemap::Interface'
-    };
-
+role_type SitemapIndexSitemap, { role => 'WWW::SitemapIndex::XML::Sitemap::Interface' };
 
 # <loc>
 subtype Location,
@@ -60,6 +55,20 @@ coerce LowercaseStr,
     from Str,
     via { lc($_) };
 
+subtype Max100CharsStr,
+    as Str,
+    where {
+        length($_) <= 100
+    },
+    message { "Maximum of 100 characters allowed" };
+
+subtype Max2048CharsStr,
+    as Str,
+    where {
+        length($_) <= 2048
+    },
+    message { "Maximum of 2048 characters allowed" };
+
 # <changefreq>
 my %valid_changefreqs = map { $_ => 1 } qw( always hourly daily weekly monthly yearly never );
 subtype ChangeFreq,
@@ -79,6 +88,79 @@ subtype Priority,
         $_ >= 0 && $_ <= 1
     },
     message { 'Valid priority ranges from 0.0 to 1.0'};
+
+# allow_embed
+my %valid_str_bool = ( yes => 1, no => 1 );
+subtype StrBool,
+    as LowercaseStr,
+    where {
+        exists $valid_str_bool{ lc($_) }
+    };
+
+coerce StrBool,
+    from Bool,
+    via { $_ ? 'yes' : 'no' };
+
+role_type VideoObject, { role => 'WWW::Sitemap::XML::Google::Video::Interface' };
+
+coerce VideoObject,
+    from HashRef,
+    via {
+        return WWW::Sitemap::XML::Google::Video->new( %{ $_ || {} } )
+    };
+
+subtype ArrayRefOfVideoObjects,
+    as ArrayRef[VideoObject];
+
+coerce ArrayRefOfVideoObjects,
+    from ArrayRef[HashRef|Object],
+    via {
+        [
+            map { blessed($_) ? $_ : WWW::Sitemap::XML::Google::Video->new( %{ $_ || {} } ) } @$_
+        ]
+    };
+
+role_type ImageObject, { role => 'WWW::Sitemap::XML::Google::Image::Interface' };
+
+coerce ImageObject,
+    from HashRef,
+    via {
+        return WWW::Sitemap::XML::Google::Image->new( %{ $_ || {} } )
+    };
+
+subtype ArrayRefOfImageObjects,
+    as ArrayRef[ImageObject],
+    where {
+        scalar(@$_) <= 1000
+    };
+
+coerce ArrayRefOfImageObjects,
+    from ArrayRef[HashRef|Object],
+    via {
+        [
+            map { blessed($_) ? $_ : WWW::Sitemap::XML::Google::Image->new( %{ $_ || {} } ) } @$_
+        ]
+    };
+
+
+role_type VideoPlayer, { role => 'WWW::Sitemap::XML::Google::Video::Player::Interface' };
+
+coerce VideoPlayer,
+    from HashRef,
+    via {
+        WWW::Sitemap::XML::Google::Video::Player->new( %{ $_ || {} } )
+    };
+
+coerce VideoPlayer,
+    from Str,
+    via {
+        WWW::Sitemap::XML::Google::Video::Player->new( loc => $_ )
+    };
+
+# runtime to avoid circular references
+require WWW::Sitemap::XML::Google::Image;
+require WWW::Sitemap::XML::Google::Video;
+require WWW::Sitemap::XML::Google::Video::Player;
 
 =head1 DESCRIPTION
 
@@ -136,7 +218,7 @@ Subtype of C<Num> with values in range from C<0.0> to C<1.0>.
         isa => SitemapURL,
     );
 
-Subtype of C<Object>, argument needs to implement L<WWW::Sitemap::XML::URL::Interface>.
+Role type, argument needs to implement L<WWW::Sitemap::XML::URL::Interface>.
 
 =type SitemapIndexSitemap
 
@@ -145,7 +227,112 @@ Subtype of C<Object>, argument needs to implement L<WWW::Sitemap::XML::URL::Inte
         isa => SitemapIndexSitemap,
     );
 
-Subtype of C<Object>, argument needs to implement L<WWW::SitemapIndex::XML::Sitemap::Interface>.
+Role type, argument needs to implement L<WWW::SitemapIndex::XML::Sitemap::Interface>.
+
+=type LowercaseStr
+
+    has 'lowercase' => (
+        is => 'rw',
+        coerce => 1,
+        isa => LowercaseStr,
+    );
+
+Subtype of C<Str>, with only lowercase characters.
+
+Coerces from Str using C<lc>.
+
+=type Max100CharsStr
+
+    has 'short_str' => (
+        is => 'rw',
+        isa => Max100CharsStr,
+    );
+
+Subtype of C<Str>, up to 100 characters.
+
+=type Max2048CharsStr
+
+    has 'longer_str' => (
+        is => 'rw',
+        isa => Max2048CharsStr,
+    );
+
+Subtype of C<Str>, up to 2048 characters.
+
+=type StrBool
+
+    has 'yes_no' => (
+        is => 'rw',
+        coerce => 1,
+        isa => StrBool,
+    );
+
+Subtype of C<LowercaseStr>, with valid values I<yes> and I<no>.
+
+Coerces from I<Bool>.
+
+=type ImageObject
+
+    has 'image' => (
+        is => 'rw',
+        coerce => 1,
+        isa => ImageObject,
+    );
+
+Role type, argument needs to implement L<WWW::Sitemap::XML::Google::Image::Interface>.
+
+Coerces from I<HashRef> by creating L<WWW::Sitemap::XML::Google::Image> object.
+
+=type ArrayRefOfImageObjects
+
+    has 'images' => (
+        is => 'rw',
+        coerce => 1,
+        isa => ArrayRefOfImageObjects,
+    );
+
+Subtype of C<ArrayRef>, were values are L<"ImageObject"> elements.
+
+Coerces from I<ArrayRef[HashRef]> by creating an array of L<WWW::Sitemap::XML::Google::Image> objects.
+
+=type VideoObject
+
+    has 'video' => (
+        is => 'rw',
+        coerce => 1,
+        isa => VideoObject,
+    );
+
+Role type, argument needs to implement L<WWW::Sitemap::XML::Google::Video::Interface>.
+
+Coerces from I<HashRef> by creating L<WWW::Sitemap::XML::Google::Video> object.
+
+=type ArrayRefOfVideoObjects
+
+    has 'videos' => (
+        is => 'rw',
+        coerce => 1,
+        isa => ArrayRefOfVideoObjects,
+    );
+
+Subtype of C<ArrayRef>, were values are L<"VideoObject"> elements.
+
+Coerces from I<ArrayRef[HashRef]> by creating an array of L<WWW::Sitemap::XML::Google::Video> objects.
+
+=type VideoPlayer
+
+    has 'video_player' => (
+        is => 'rw',
+        coerce => 1,
+        isa => VideoPlayer,
+    );
+
+Role type, argument needs to implement L<WWW::Sitemap::XML::Google::Video::Player::Interface>.
+
+Coerces from I<HashRef> by creating L<WWW::Sitemap::XML::Google::Video::Player> object.
+
+Coerces from I<Str> by creating L<WWW::Sitemap::XML::Google::Video::Player>
+object, where the string is used as <WWW::Sitemap::XML::Google::Video::Player/"loc">.
 
 =cut
 

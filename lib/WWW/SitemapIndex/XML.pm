@@ -7,7 +7,7 @@ use Moose;
 extends qw( WWW::Sitemap::XML );
 
 use WWW::SitemapIndex::XML::Sitemap;
-use XML::LibXML 1.70;
+use XML::LibXML;
 use Scalar::Util qw( blessed );
 
 use WWW::Sitemap::XML::Types qw( SitemapIndexSitemap );

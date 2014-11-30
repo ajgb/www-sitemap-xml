@@ -6,7 +6,7 @@ package WWW::Sitemap::XML;
 use Moose;
 
 use WWW::Sitemap::XML::URL;
-use XML::LibXML 1.70;
+use XML::LibXML qw(XML_ELEMENT_NODE);
 use Scalar::Util qw( blessed );
 
 use WWW::Sitemap::XML::Types qw( SitemapURL );
@@ -26,6 +26,33 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
         lastmod => '2010-11-22',
         changefreq => 'monthly',
         priority => 1.0,
+        images => [
+            {
+                loc => 'http://mywebsite.com/image1.jpg',
+                caption => Caption 1',
+                title => 'Title 1',
+                license => 'http://www.mozilla.org/MPL/2.0/',
+                geo_location => 'Town, Region',
+            },
+            {
+                loc => 'http://mywebsite.com/image2.jpg',
+                caption => Caption 2',
+                title => 'Title 2',
+                license => 'http://www.mozilla.org/MPL/2.0/',
+                geo_location => 'Town, Region',
+            }
+        ],
+        videos => {
+            content_loc => 'http://mywebsite.com/video1.flv',
+            player => {
+                loc => 'http://mywebsite.com/video_player.swf?video=1',
+                allow_embed => "yes",
+                autoplay => "ap=1",
+            },
+            thumbnail_loc => 'http://mywebsite.com/thumbs/1.jpg',
+            title => 'Video Title 1',
+            description => 'Video Description 1',
+        }
     );
 
     # or
@@ -35,14 +62,49 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
             lastmod => '2010-11-22',
             changefreq => 'monthly',
             priority => 1.0,
+            images => [
+                WWW::Sitemap::XML::Google::Image->new(
+                    {
+                        loc => 'http://mywebsite.com/image1.jpg',
+                        caption => 'Caption 1',
+                        title => 'Title 1',
+                        license => 'http://www.mozilla.org/MPL/2.0/',
+                        geo_location => 'Town, Region',
+                    },
+                ),
+                WWW::Sitemap::XML::Google::Image->new(
+                    {
+                        loc => 'http://mywebsite.com/image2.jpg',
+                        caption => 'Caption 2',
+                        title => 'Title 2',
+                        license => 'http://www.mozilla.org/MPL/2.0/',
+                        geo_location => 'Town, Region',
+                    }
+                ),
+            ],
+            videos => [
+                WWW::Sitemap::XML::Google::Video->new(
+                    content_loc => 'http://mywebsite.com/video1.flv',
+                    player => WWW::Sitemap::XML::Google::Video::Player->new(
+                        {
+                            loc => 'http://mywebsite.com/video_player.swf?video=1',
+                            allow_embed => "yes",
+                            autoplay => "ap=1",
+                        }
+                    ),
+                    thumbnail_loc => 'http://mywebsite.com/thumbs/1.jpg',
+                    title => 'Video Title 1',
+                    description => 'Video Description 1',
+                ),
+            ],
         )
     );
 
     # read URLs from existing sitemap.xml file
-    my @urls = $map->read( 'sitemap.xml' );
+    my @urls = $map->read( location => 'sitemap.xml' );
 
     # load urls from existing sitemap.xml file
-    $map->load( 'sitemap.xml' );
+    $map->load( location => 'sitemap.xml' );
 
     # get XML::LibXML object
     my $xml = $map->as_xml;
@@ -58,7 +120,8 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
 
 =head1 DESCRIPTION
 
-Read and write sitemap XML files as defined at L<http://www.sitemaps.org/>.
+Read and write sitemap XML files as defined at L<http://www.sitemaps.org/> and
+with support of Google video and image extensions described at L<https://support.google.com/webmasters/answer/183668>.
 
 =cut
 
@@ -103,6 +166,8 @@ has '_root_ns' => (
                 'http://www.sitemaps.org/schemas/sitemap/0.9',
                 'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'
             ),
+            'xmlns:image' => "http://www.google.com/schemas/sitemap-image/1.1",
+            'xmlns:video' => "http://www.google.com/schemas/sitemap-video/1.1",
         }
     },
 );
@@ -253,12 +318,62 @@ sub read {
     my $xml = XML::LibXML->load_xml( %args );
     my $doc = $xml->getDocumentElement;
 
+    my @ns = $doc->getNamespaces();
+    for my $ns ( @ns ) {
+        my $name = $ns->localname;
+        next unless $name;
+
+        $self->_root_ns->{ $ns->nodeName } = $ns->href;
+    }
+
     for my $url ( $doc->getChildrenByLocalName( $self->_entry_elem ) ) {
+        my @childNodes = grep { $_->nodeType == XML_ELEMENT_NODE() } $url->nonBlankChildNodes;
+        my %args;
+        for my $n ( @childNodes ) {
+            my $localname = $n->localname;
+
+            if ( $localname eq 'image' ) {
+                push @{ $args{images} }, {
+                    map {
+                        $_->localname => $_->firstChild->nodeValue
+                    }
+                    grep { $_->nodeType == XML_ELEMENT_NODE() }
+                    $n->nonBlankChildNodes
+                };
+            }
+            elsif ( $localname eq 'video' ) {
+                my $video = {};
+                my @videoChildNodes = grep { $_->nodeType == XML_ELEMENT_NODE() } $n->nonBlankChildNodes;
+
+                for my $cn ( @videoChildNodes ) {
+                    my $vname = $cn->localname;
+
+                    if ( $vname eq 'player_loc' ) {
+                        $video->{player} = {
+                            loc => $cn->firstChild->nodeValue,
+                            (
+                                map {
+                                    $_ => $cn->getAttribute($_)
+                                }
+                                grep {
+                                    $cn->hasAttribute($_)
+                                } qw( allow_embed autoplay )
+                            )
+                        };
+                    }
+                    else {
+                        $video->{ $vname } = $cn->firstChild->nodeValue;
+                    }
+                }
+
+                push @{ $args{videos} }, $video;
+            }
+            else {
+                $args{ $n->localname } = $n->firstChild->nodeValue;
+            }
+        }
         push @entries,
-            $class->new(
-                map { $_->localname => $_->textContent }
-                $url->nonBlankChildNodes
-            );
+            $class->new( %args );
     }
 
     return @entries;
@@ -354,7 +469,7 @@ L<WWW::SitemapIndex::XML>
 
 L<http://www.sitemaps.org/>
 
-L<Search::Sitemap>
+L<https://support.google.com/webmasters/answer/183668>
 
 =cut
 

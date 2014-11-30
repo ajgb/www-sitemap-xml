@@ -6,7 +6,7 @@ package WWW::Sitemap::XML::URL::Interface;
 use Moose::Role;
 
 requires qw(
-    loc lastmod changefreq priority as_xml
+    loc lastmod changefreq priority images videos as_xml
 );
 
 =head1 SYNOPSIS
@@ -19,33 +19,18 @@ requires qw(
         isa => 'Str',
     );
 
+    has [qw( images videos )] => (
+        is => 'rw',
+        isa => 'ArrayRef',
+    );
+
     with 'WWW::Sitemap::XML::URL::Interface';
 
 =head1 DESCRIPTION
 
 Abstract interface for URL elements added to sitemap.
 
-=head1 ABSTRACT METHODS
-
-=head2 loc
-
-URL of the page.
-
-=head2 lastmod
-
-The date of last modification of the file.
-
-=head2 changefreq
-
-How frequently the page is likely to change.
-
-=head2 priority
-
-The priority of this URL relative to other URLs on your site.
-
-=head2 as_xml
-
-XML representing the C<E<lt>urlE<gt>> entry in the sitemap.
+See L<WWW::Sitemap::XML::URL> for details.
 
 =cut
 

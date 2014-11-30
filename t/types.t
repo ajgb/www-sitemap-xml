@@ -25,6 +25,11 @@ use URI;
         isa => 'Str',
     );
 
+    has [qw( images videos )] => (
+        is => 'rw',
+        isa => 'ArrayRef',
+    );
+
     with 'WWW::Sitemap::XML::URL::Interface';
 }
 
@@ -54,7 +59,7 @@ use URI;
 
     package Test::WWW::Sitemap::XML::Types;
     use Moose;
-    use WWW::Sitemap::XML::Types qw( SitemapURL SitemapIndexSitemap Location ChangeFreq Priority );
+    use WWW::Sitemap::XML::Types qw( SitemapURL SitemapIndexSitemap Location ChangeFreq Priority ArrayRefOfImageObjects ArrayRefOfVideoObjects );
 
     has 'sitemap' => (
         is => 'rw',
@@ -80,6 +85,16 @@ use URI;
     has 'priority' => (
         is => 'rw',
         isa => Priority,
+    );
+
+    has 'images' => (
+        is => 'rw',
+        isa => ArrayRefOfImageObjects,
+    );
+
+    has 'videos' => (
+        is => 'rw',
+        isa => ArrayRefOfVideoObjects,
     );
 
 }
