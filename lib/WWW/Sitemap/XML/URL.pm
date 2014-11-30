@@ -31,7 +31,7 @@ XML output:
        </url>
     </urlset>
 
-Google sitemap video and image extensions:
+Google sitemap video, image and mobile extensions:
 
     my $url2 = WWW::Sitemap::XML::URL->new(
         loc => 'http://mywebsite.com/',
@@ -42,14 +42,14 @@ Google sitemap video and image extensions:
         images => [
             {
                 loc => 'http://mywebsite.com/image1.jpg',
-                caption => Caption 1',
+                caption => 'Caption 1',
                 title => 'Title 1',
                 license => 'http://www.mozilla.org/MPL/2.0/',
                 geo_location => 'Town, Region',
             },
             {
                 loc => 'http://mywebsite.com/image2.jpg',
-                caption => Caption 2',
+                caption => 'Caption 2',
                 title => 'Title 2',
                 license => 'http://www.mozilla.org/MPL/2.0/',
                 geo_location => 'Town, Region',
@@ -73,6 +73,7 @@ XML output:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
        <url>
@@ -116,8 +117,6 @@ Class implements L<WWW::Sitemap::XML::URL::Interface>.
 =cut
 
 =attr loc
-
-    $url->loc('http://mywebsite.com/')
 
 URL of the page.
 
@@ -238,7 +237,7 @@ non-featurephone content, create a separate sitemap for those URLs.
 
 Note: This is a Google sitemap extension.
 
-isa: I<Bool>
+isa: C<Bool>
 
 Optional.
 
@@ -311,6 +310,12 @@ with 'WWW::Sitemap::XML::URL::Interface';
 =head1 SEE ALSO
 
 L<http://www.sitemaps.org/protocol.php>
+
+L<WWW::Sitemap::XML::Google::Image>
+
+L<WWW::Sitemap::XML::Google::Video>
+
+L<https://support.google.com/webmasters/answer/183668>
 
 =cut
 

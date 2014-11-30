@@ -15,7 +15,7 @@ use XML::LibXML;
         lastmod => '2010-11-26',
     );
 
-XML sample:
+XML output:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -27,16 +27,13 @@ XML sample:
 
 =head1 DESCRIPTION
 
-WWW::SitemapIndex::XML::Sitemap represents single sitemap entry in sitemap
-index file.
+WWW::SitemapIndex::XML::Sitemap represents single sitemap entry in sitemaps index file.
 
 Class implements L<WWW::SitemapIndex::XML::Sitemap::Interface>.
 
 =cut
 
 =attr loc
-
-    $url->loc('http://mywebsite.com/sitemap1.xml.gz')
 
 URL of the sitemap.
 
@@ -75,7 +72,7 @@ has 'lastmod' => (
 =method as_xml
 
 Returns L<XML::LibXML::Element> object representing the C<E<lt>sitemapE<gt>>
-entry in the sitemap.
+entry in the sitemaps index.
 
 =cut
 

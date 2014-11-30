@@ -60,7 +60,7 @@ has 'loc' => (
 
 The caption of the image.
 
-isa: I<Str>
+isa: C<Str>
 
 Optional.
 
@@ -77,7 +77,7 @@ has 'caption' => (
 
 The title of the image.
 
-isa: I<Str>
+isa: C<Str>
 
 Optional.
 
@@ -94,7 +94,7 @@ has 'title' => (
 
 The geographic location of the image.
 
-isa: I<Str>
+isa: C<Str>
 
 Optional.
 

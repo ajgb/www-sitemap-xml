@@ -72,7 +72,7 @@ has 'allow_embed' => (
 User-defined string that Google may append (if appropriate) to the flashvars
 parameter to enable autoplay of the video.
 
-isa: I<Str>
+isa: C<Str>
 
 Optional.
 

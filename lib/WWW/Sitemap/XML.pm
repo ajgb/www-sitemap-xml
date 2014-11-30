@@ -30,14 +30,14 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
         images => [
             {
                 loc => 'http://mywebsite.com/image1.jpg',
-                caption => Caption 1',
+                caption => 'Caption 1',
                 title => 'Title 1',
                 license => 'http://www.mozilla.org/MPL/2.0/',
                 geo_location => 'Town, Region',
             },
             {
                 loc => 'http://mywebsite.com/image2.jpg',
-                caption => Caption 2',
+                caption => 'Caption 2',
                 title => 'Title 2',
                 license => 'http://www.mozilla.org/MPL/2.0/',
                 geo_location => 'Town, Region',
@@ -123,7 +123,7 @@ use WWW::Sitemap::XML::Types qw( SitemapURL );
 =head1 DESCRIPTION
 
 Read and write sitemap XML files as defined at L<http://www.sitemaps.org/> and
-with support of Google video and image extensions described at L<https://support.google.com/webmasters/answer/183668>.
+with support of Google video, image and mobile extensions described at L<https://support.google.com/webmasters/answer/183668>.
 
 =cut
 

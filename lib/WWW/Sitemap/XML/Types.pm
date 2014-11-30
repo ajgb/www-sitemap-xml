@@ -239,7 +239,7 @@ Role type, argument needs to implement L<WWW::SitemapIndex::XML::Sitemap::Interf
 
 Subtype of C<Str>, with only lowercase characters.
 
-Coerces from Str using C<lc>.
+Coerces from C<Str> using C<lc>.
 
 =type Max100CharsStr
 
@@ -269,7 +269,7 @@ Subtype of C<Str>, up to 2048 characters.
 
 Subtype of C<LowercaseStr>, with valid values I<yes> and I<no>.
 
-Coerces from I<Bool>.
+Coerces from C<Bool>.
 
 =type ImageObject
 
@@ -281,7 +281,7 @@ Coerces from I<Bool>.
 
 Role type, argument needs to implement L<WWW::Sitemap::XML::Google::Image::Interface>.
 
-Coerces from I<HashRef> by creating L<WWW::Sitemap::XML::Google::Image> object.
+Coerces from C<HashRef> by creating L<WWW::Sitemap::XML::Google::Image> object.
 
 =type ArrayRefOfImageObjects
 
@@ -293,7 +293,7 @@ Coerces from I<HashRef> by creating L<WWW::Sitemap::XML::Google::Image> object.
 
 Subtype of C<ArrayRef>, were values are L<"ImageObject"> elements.
 
-Coerces from I<ArrayRef[HashRef]> by creating an array of L<WWW::Sitemap::XML::Google::Image> objects.
+Coerces from C<ArrayRef[HashRef]> by creating an array of L<WWW::Sitemap::XML::Google::Image> objects.
 
 =type VideoObject
 
@@ -305,7 +305,7 @@ Coerces from I<ArrayRef[HashRef]> by creating an array of L<WWW::Sitemap::XML::G
 
 Role type, argument needs to implement L<WWW::Sitemap::XML::Google::Video::Interface>.
 
-Coerces from I<HashRef> by creating L<WWW::Sitemap::XML::Google::Video> object.
+Coerces from C<HashRef> by creating L<WWW::Sitemap::XML::Google::Video> object.
 
 =type ArrayRefOfVideoObjects
 
@@ -317,7 +317,7 @@ Coerces from I<HashRef> by creating L<WWW::Sitemap::XML::Google::Video> object.
 
 Subtype of C<ArrayRef>, were values are L<"VideoObject"> elements.
 
-Coerces from I<ArrayRef[HashRef]> by creating an array of L<WWW::Sitemap::XML::Google::Video> objects.
+Coerces from C<ArrayRef[HashRef]> by creating an array of L<WWW::Sitemap::XML::Google::Video> objects.
 
 =type VideoPlayer
 
@@ -329,10 +329,10 @@ Coerces from I<ArrayRef[HashRef]> by creating an array of L<WWW::Sitemap::XML::G
 
 Role type, argument needs to implement L<WWW::Sitemap::XML::Google::Video::Player::Interface>.
 
-Coerces from I<HashRef> by creating L<WWW::Sitemap::XML::Google::Video::Player> object.
+Coerces from C<HashRef> by creating L<WWW::Sitemap::XML::Google::Video::Player> object.
 
-Coerces from I<Str> by creating L<WWW::Sitemap::XML::Google::Video::Player>
-object, where the string is used as <WWW::Sitemap::XML::Google::Video::Player/"loc">.
+Coerces from C<Str> by creating L<WWW::Sitemap::XML::Google::Video::Player>
+object, where the string is used as L<WWW::Sitemap::XML::Google::Video::Player/"loc">.
 
 =cut
 

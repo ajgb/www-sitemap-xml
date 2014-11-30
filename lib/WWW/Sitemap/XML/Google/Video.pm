@@ -11,13 +11,11 @@ use XML::LibXML;
 
     my $video = WWW::Sitemap::XML::Google::Video->new(
         content_loc => 'http://mywebsite.com/video1.flv',
-        player => WWW::Sitemap::XML::Google::Video::Player->new(
-            {
-                loc => 'http://mywebsite.com/video_player.swf?video=1',
-                allow_embed => "yes",
-                autoplay => "ap=1",
-            }
-        ),
+        player => {
+            loc => 'http://mywebsite.com/video_player.swf?video=1',
+            allow_embed => "yes",
+            autoplay => "ap=1",
+        },
         thumbnail_loc => 'http://mywebsite.com/thumbs/1.jpg',
         title => 'Video Title 1',
         description => 'Video Description 1',
