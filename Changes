@@ -1,6 +1,8 @@
 Revision history for WWW-Sitemap-XML
 
 {{$NEXT}}
+
+2.00   2014-11-30 02:03:03
     Automatically lowercase the changefreq when loading invalid sitemaps
         (Requested in GH#5 Case insensitive values, by rkleemann)
     Ignore comments from loaded XML files
