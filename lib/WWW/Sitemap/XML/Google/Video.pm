@@ -178,7 +178,7 @@ around BUILDARGS => sub {
     my $class = shift;
 
     if ( @_ == 1 && ! ref $_[0] ) {
-        return $class->$next(loc => $_[0]);
+        return $class->$next(content_loc => $_[0]);
     }
 
     return $class->$next( @_ );
