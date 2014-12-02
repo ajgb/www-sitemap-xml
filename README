@@ -2,7 +2,7 @@ NAME
     WWW::Sitemap::XML - XML Sitemap protocol
 
 VERSION
-    version 2.01
+    version 2.02
 
 SYNOPSIS
         use WWW::Sitemap::XML;
