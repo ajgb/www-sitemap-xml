@@ -4,7 +4,8 @@ use warnings;
 
 use Test::More tests => 10;
 use Test::Exception;
-use Test::NoWarnings;
+use Test::NoWarnings qw(had_no_warnings);
+$Test::NoWarnings::do_end_test = 0;
 
 BEGIN { use_ok('WWW::Sitemap::XML::URL') }
 
@@ -51,3 +52,9 @@ for my $args ( @invalid ) {
     } 'object not created with invalid args';
 }
 
+
+SKIP: {
+    skip 'author testing', 1 unless ($ENV{'AUTHOR_TESTING'});
+
+    had_no_warnings;
+};
