@@ -4,7 +4,8 @@ use warnings;
 
 use Test::More tests => 31;
 use Test::Exception;
-use Test::NoWarnings;
+use Test::NoWarnings qw(had_no_warnings);
+$Test::NoWarnings::do_end_test = 0;
 use URI;
 
 BEGIN { use_ok('WWW::SitemapIndex::XML') };
@@ -131,3 +132,9 @@ SKIP: {
 };
 
 
+
+SKIP: {
+    skip 'author testing', 1 unless ($ENV{'AUTHOR_TESTING'});
+
+    had_no_warnings;
+};

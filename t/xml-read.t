@@ -4,7 +4,8 @@ use warnings;
 
 use Test::More tests => 9;
 use Test::Exception;
-use Test::NoWarnings;
+use Test::NoWarnings qw(had_no_warnings);
+$Test::NoWarnings::do_end_test = 0;
 
 BEGIN { use_ok('WWW::Sitemap::XML') };
 
@@ -78,3 +79,9 @@ sub _read_sitemap {
     close SITEMAP;
     return $xml;
 }
+
+SKIP: {
+    skip 'author testing', 1 unless ($ENV{'AUTHOR_TESTING'});
+
+    had_no_warnings;
+};

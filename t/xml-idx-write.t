@@ -4,7 +4,8 @@ use warnings;
 
 use Test::More tests => 17;
 use Test::Exception;
-use Test::NoWarnings;
+use Test::NoWarnings qw(had_no_warnings);
+$Test::NoWarnings::do_end_test = 0;
 use IO::Zlib;
 use IO::File;
 
@@ -99,3 +100,9 @@ sub _read {
     return $xml;
 }
 
+
+SKIP: {
+    skip 'author testing', 1 unless ($ENV{'AUTHOR_TESTING'});
+
+    had_no_warnings;
+};

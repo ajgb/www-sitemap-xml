@@ -3,7 +3,8 @@ use warnings;
 
 use Test::More tests => 40;
 use Test::Exception;
-use Test::NoWarnings;
+use Test::NoWarnings qw(had_no_warnings);
+$Test::NoWarnings::do_end_test = 0;
 use URI;
 
 {
@@ -185,3 +186,9 @@ for my $p (qw( -1 2 10 )) {
         $o->priority( $p );
     } qr/Valid priority ranges from 0.0 to 1.0/, "$p is not a valid Priority";
 }
+
+SKIP: {
+    skip 'author testing', 1 unless ($ENV{'AUTHOR_TESTING'});
+
+    had_no_warnings;
+};
