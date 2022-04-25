@@ -41,6 +41,8 @@ subtype Location,
     message { "$_ is not a valid URL" };
 
 coerce Location,
+    from Object,
+    via { qq($_) },
     from Uri,
     via { $_->as_string };
 

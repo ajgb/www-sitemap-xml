@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 use Test::Exception;
 use Test::NoWarnings;
 
@@ -12,6 +12,9 @@ BEGIN { use_ok('WWW::Sitemap::XML::URL') }
 my $o;
 
 my @valid = (
+    {
+        loc => 'https://domain.test:8443/test/p',
+    },
     {
         loc => 'http://www.mywebsite.com/friendly_url.html?name=Alex%20J.%20G.%20Burzyński',
     },
